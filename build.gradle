@@ -1,0 +1,65 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+}
+
+group = 'com.example.tteongsang.backend'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Spring Boot Starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    //Spring Web socket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    //Thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    //MongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    //logging
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    //Spring Boot Security(JWT 인증용)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // JJWT (JWT 생성 및 검증)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' //JSON 직렬화 지원
+
+    //Lombok(코드 간소화)
+    implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-common:2.5.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    //monitoring
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' //actuator
+    implementation 'io.micrometer:micrometer-registry-prometheus' //prometheus
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

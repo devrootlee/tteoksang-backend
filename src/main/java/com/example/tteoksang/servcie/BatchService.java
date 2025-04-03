@@ -32,7 +32,6 @@ public class BatchService {
                     } else throw new RuntimeException();
                 }).block();
 
-
         if (response != null) {
             //page 개수 구하기
             int pageSize = Integer.parseInt(response.get("pageSize").toString());
@@ -41,21 +40,21 @@ public class BatchService {
 
             //전체 page 개수만큼 호출
             for (int i = 0; i < totalPage; i++) {
-                int requestPage = i + 1;
+                int page = i + 1;
 
                 response = webClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("/api/stocks/marketValue/all")
-                                .queryParam("page", requestPage)
+                                .queryParam("page", page)
                                 .build()
                         ).exchangeToMono(clientResponse -> {
                             if (clientResponse.statusCode().is2xxSuccessful()) {
                                 return clientResponse.bodyToMono(Map.class);
-                            } else return null;
+                            } else throw new RuntimeException();
                         }).block();
-                System.out.println(response);
+
                 List<Map> apiStocks = (List) response.get("stocks");
-                if (!apiStocks.isEmpty()){
+                if (!apiStocks.isEmpty()) {
                     List<Stock> saveStocks = new ArrayList<>();
                     for (Map apiItem : apiStocks) {
                         //주식만 저장(etf,etn 제외)
@@ -67,7 +66,7 @@ public class BatchService {
                                     .exchangeKor(((Map)apiItem.get("stockExchangeType")).get("nameKor").toString())
                                     .stockNameEng(null)
                                     .stockNameKor(apiItem.get("stockName").toString())
-                                    .marketValue(Integer.parseInt(apiItem.get("marketValue").toString().replace(",","")))
+                                    .marketValue(Long.parseLong(apiItem.get("marketValue").toString().replace(",","")))
                                     .marketValueUsd(null)
                                     .marketValueKor(apiItem.get("marketValueHangeul").toString())
                                     .build();
@@ -79,12 +78,81 @@ public class BatchService {
                 }
             }
         } else {
-            // 응답 데이터 없음
+            //응답 데이터 없음
+            throw new RuntimeException();
         }
     }
 
     //미국 주식 동기화
+    @Transactional
     public void stockUsSync() {
+        WebClient webClient = WebClient.create("https://api.stock.naver.com");
 
+        String[] exchangeArr = {"NASDAQ", "NYSE", "AMEX"};
+        for (String exchange : exchangeArr) {
+            Map response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/stock/exchange/" + exchange)
+                            .build()
+
+                    ).exchangeToMono(clientResponse -> {
+                        if (clientResponse.statusCode().is2xxSuccessful()) {
+                            return clientResponse.bodyToMono(Map.class);
+                        } else throw new RuntimeException();
+                    }).block();
+
+            if (response != null) {
+                //page 개수 구하기
+                int pageSize = Integer.parseInt(response.get("pageSize").toString());
+                int totalCount = Integer.parseInt(response.get("totalCount").toString());
+                int totalPage = (int) Math.ceil((double) totalCount / pageSize);
+
+                //전체 page 개수만큼 호출
+                for (int i = 0; i < totalPage; i++) {
+                    int page = i + 1;
+
+                    response = webClient.get()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path("/stock/exchange/" + exchange)
+                                    .queryParam("page", page)
+                                    .build()
+                            ).exchangeToMono(clientResponse -> {
+                                if (clientResponse.statusCode().is2xxSuccessful()) {
+                                    return clientResponse.bodyToMono(Map.class);
+                                } else return null;
+                            }).block();
+
+                    List<Map> apiStocks = (List) response.get("stocks");
+                    if (!apiStocks.isEmpty()) {
+                        List<Stock> saveStocks = new ArrayList<>();
+                        for (Map apiItem : apiStocks) {
+                            System.out.println(apiItem.get("symbolCode") + ": " + apiItem.get("marketValue"));
+                            //주식만 저장
+                            if (apiItem.get("reutersIndustryCode") != null && !apiItem.get("reutersIndustryCode").toString().equals("5560101011") && !apiItem.get("marketValue").toString().equals("-")) {
+
+                                Stock stock = Stock.builder()
+                                        .stockId(apiItem.get("symbolCode").toString())
+                                        .nationType(apiItem.get("nationType").toString())
+                                        .exchangeEng(((Map)apiItem.get("stockExchangeType")).get("nameEng").toString())
+                                        .exchangeKor(((Map)apiItem.get("stockExchangeType")).get("nameKor").toString())
+                                        .stockNameEng(apiItem.get("stockNameEng").toString())
+                                        .stockNameKor(apiItem.get("stockName").toString())
+                                        .marketValue(Long.parseLong(apiItem.get("marketValue").toString().replace(",", "")))
+                                        .marketValueUsd(apiItem.get("marketValueHangeul").toString())
+                                        .marketValueKor(apiItem.get("marketValueKrwHangeul").toString())
+                                        .build();
+
+                                saveStocks.add(stock);
+                            }
+                        }
+                        stockRepository.saveAll(saveStocks);
+                    }
+                }
+
+            } else {
+                //응답 데이터 없음
+                throw new RuntimeException();
+            }
+        }
     }
 }

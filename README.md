@@ -53,14 +53,40 @@
 - JSON, 고급 SQL 기능, 트랜잭션 안정성 등에서 MySQL보다 강점이 많음
 - 확장성과 분석 기능이 뛰어나 주식 데이터 저장 및 처리에 최적화
 
-유저 정보 테이블(members)
+- 유저 정보 테이블(members)
 ```
 # members
 ```
 
-주식 정보 테이블(stocks)
+- 주식 정보 테이블(stocks)
+주식 정보는 한국주식, 미국주식으로 나누려 했으나 종목코드(stock_id)가 달라서 하나로 통합가능하여 하나의 테이블로 만들었다. 
+  - 한국주식
+    - stock_name_eng : null
+    - market_value_usd : null
+  - 미국주식
+    - null 값 없음
 ```
 # stocks
+
+CREATE TABLE stock (
+    stock_id VARCHAR(255) PRIMARY KEY,
+    nation_type VARCHAR(255) NOT NULL,
+    exchange_eng VARCHAR(255) NOT NULL,
+    exchange_kor VARCHAR(255) NOT NULL,
+    stock_name_eng VARCHAR(255),
+    stock_name_kor VARCHAR(255) NOT NULL,
+    market_value BIGINT NOT NULL, # int의 최대값이 2,147,483,647 이기 때문에 BigInt로 지정 : 엔비디아 시총 $2,694,248,000
+    market_value_usd VARCHAR(255),
+    market_value_kor VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL
+);
+
+-- 인덱스
+CREATE INDEX idx_exchange_eng ON stock(exchange_eng);
+CREATE INDEX idx_exchange_kor ON stock(exchange_kor);
+CREATE INDEX idx_stock_name_eng ON stock(stock_name_eng);
+CREATE INDEX idx_stock_name_kor ON stock(stock_name_kor);
 ```
 
 
@@ -72,7 +98,12 @@
 한국/미국 주식 전체 정보를 조회하는 방법을 찾아보고 있는데 제공해주는 곳이 국내는 공공데이터포털에서 찾을 수 있었는데 미국주식은 제공해주는곳이 없었다.<br>
 프로젝트를 진행하려면 이게 제일 중요한데 어떡하지... 하면서 계속 검색을 해봤는데 발견되지 않았다.<br>
 고민하던 찰나에 네이버 증권에서 개발자도구로 찾던 도중 주식정보를 불러오는 것 같은 API를 찾아내었다. 막혀있지 않아서 이걸 사용해서 종목정보를 가져와야겠다, 감사합니다 네이버!<br>
-데이터는 자바로 가져와도 되지만 파이썬을 별로 안써봐서 배울겸 파이썬을 이용해 가져오도록하자.<br>
+데이터는 스프링의 Scheduler 기능을 이용해 하루에 한번씩 가져오도록한다.<br>
+
+* 참고 코드 
+- [BatchJob.java](src/main/java/com/example/tteoksang/batch/BatchJob.java)
+- [BatchService.java](src/main/java/com/example/tteoksang/servcie/BatchService.java)
+
 
 미국 전체 주식 조회 API
 - API URI
@@ -241,3 +272,22 @@
 
 <h3>📝 오류 모니터링</h3>
 슬랙 웹훅을 사용하여 오류가 발생할 때 슬랙으로 메시지가 가도록 하였다.
+
+
+<h3>📝 CI/CD</h3>
+도커를 이용해 백엔드 이미지, 프론트 이미지를 만들어 배포한다.
+
+<h3>📝 Server</h3>
+AWS를 사용하려하였으나 이전 프로젝트에서 free-tier 를 다 사용해서 MS Azure를 사용하기로 하였다.
+- Pass 방식
+📦 MyResourceGroup
+┣ 📂 백엔드 (Spring Boot, Docker) → 가상 머신(ubuntu 24.04)
+┣ 📂 프론트엔드 (React, Nginx, Docker) → 가상 머신(ubuntu 24.04)
+┗ 📂 데이터베이스 (PostgreSQL) → Azure Database for PostgreSQL 유연한 서버
+
+1. 데이터베이스
+- 
+
+2. 백엔드 서버
+- property를 개발용과 배포용으로 나누어서 생성
+  - ![img_1.png](img_1.png)

@@ -39,7 +39,7 @@ public class Stock {
     private String stockNameKor;
 
     @Column(name = "market_value", nullable = false)
-    private int marketValue;
+    private Long marketValue;
 
     @Column(name = "market_value_usd")
     private String marketValueUsd;
@@ -48,10 +48,16 @@ public class Stock {
     private String marketValueKor;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    //엔티티가 저장되기 전에 createdAt 자동 설정
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     //엔티티가 변경되면 자동 업데이트
     @PreUpdate

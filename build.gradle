@@ -58,7 +58,7 @@ jar {
 }
 
 bootJar {
-    archiveFileName = 'app.jar'
+    archiveFileName = 'tteoksang-backend.jar'
 }
 
 tasks.named('test') {

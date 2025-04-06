@@ -1,4 +1,4 @@
-# 떡상(주식 예측 서비스) 🚀🚀
+# 떡상🚀🚀(주식 예측 서비스) - 백엔드
 
 <h3><b>📌 프로젝트 시작 배경</b></h3>
 
@@ -59,215 +59,79 @@
 ```
 
 - 주식 정보 테이블(stocks)
-주식 정보는 한국주식, 미국주식으로 나누려 했으나 종목코드(stock_id)가 달라서 하나로 통합가능하여 하나의 테이블로 만들었다. 
-  - 한국주식
-    - stock_name_eng : null
-    - market_value_usd : null
-  - 미국주식
-    - null 값 없음
-```
-# stocks
 
+주식 정보 테이블
+```
+# stock
 CREATE TABLE stock (
     stock_id VARCHAR(255) PRIMARY KEY,
     nation_type VARCHAR(255) NOT NULL,
-    exchange_eng VARCHAR(255) NOT NULL,
-    exchange_kor VARCHAR(255) NOT NULL,
-    stock_name_eng VARCHAR(255),
-    stock_name_kor VARCHAR(255) NOT NULL,
-    market_value BIGINT NOT NULL, # int의 최대값이 2,147,483,647 이기 때문에 BigInt로 지정 : 엔비디아 시총 $2,694,248,000
-    market_value_usd VARCHAR(255),
-    market_value_kor VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    market VARCHAR(255) NOT NULL,
+    stock_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NULL
 );
 
 -- 인덱스
-CREATE INDEX idx_exchange_eng ON stock(exchange_eng);
-CREATE INDEX idx_exchange_kor ON stock(exchange_kor);
-CREATE INDEX idx_stock_name_eng ON stock(stock_name_eng);
-CREATE INDEX idx_stock_name_kor ON stock(stock_name_kor);
+CREATE INDEX idx_market ON stock(market);
+CREATE INDEX idx_stock_name ON stock(stock_name);
 ```
 
+- 데이터 수집 소요 시간 테이블(data_ingest_duration_log)
 
+데이터가 수집될때 얼마나 걸리는지 확인 하기위한 테이블
+```
+CREATE TABLE data_ingest_log (
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  run_date DATE NOT NULL,
+  script_name VARCHAR(255) NOT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  duration FLOAT NOT NULL,
+  status VARCHAR(255) NOT NULL
+);
+```
+- 한국투자 Open API 접근 토큰 정보 테이블
+
+한투 API명세서에 아래와 같이 기재되어있다. 토큰과 유효기간을 DB에 저장하여 여러번 API 호출을 막기위한 용도로 사용한다. 
+1. 접근토큰(access_token)의 유효기간은 24시간 이며(1일 1회발급 원칙)
+   갱신발급주기는 6시간 입니다.(6시간 이내는 기존 발급키로 응답)
+2. 접근토큰발급(/oauth2/tokenP) 시 접근토큰값(access_token)과 함께 수신되는
+   접근토큰 유효기간(acess_token_token_expired)을 이용해 접근토큰을 관리하실 수 있습니다.
+```
+CREATE TABLE kis_token (
+    id INT PRIMARY KEY,
+    access_token text NOT NULL,
+    expired_date timestamp NOT NULL,
+    created_at timestamp NOT NULL
+);
+```
 
 <h3>💻 개발</h3>
 
-<h3>📝 주식 전체 정보 가져오기</h3>
+<h3>📝 국내/해외 주식 전체 정보 수집하기</h3>
 
 한국/미국 주식 전체 정보를 조회하는 방법을 찾아보고 있는데 제공해주는 곳이 국내는 공공데이터포털에서 찾을 수 있었는데 미국주식은 제공해주는곳이 없었다.<br>
-프로젝트를 진행하려면 이게 제일 중요한데 어떡하지... 하면서 계속 검색을 해봤는데 발견되지 않았다.<br>
-고민하던 찰나에 네이버 증권에서 개발자도구로 찾던 도중 주식정보를 불러오는 것 같은 API를 찾아내었다. 막혀있지 않아서 이걸 사용해서 종목정보를 가져와야겠다, 감사합니다 네이버!<br>
-데이터는 스프링의 Scheduler 기능을 이용해 하루에 한번씩 가져오도록한다.<br>
+프로젝트를 진행하려면 이게 제일 중요한데 어떡하지... 하면서 계속 검색을 해봤는데 파이썬에 FinanceDataReader 이라는 라이브러리가 있었다. <br>
+해당 라이브러리를 통해 파이썬으로 데이터를 수집한다.<br>
 
-* 참고 코드 
-- [BatchJob.java](src/main/java/com/example/tteoksang/batch/BatchJob.java)
-- [BatchService.java](src/main/java/com/example/tteoksang/servcie/BatchService.java)
-
-
-미국 전체 주식 조회 API
-- API URI
-    - https://api.stock.naver.com/stock/exchange/[거래소]
-- 거래소 정보
-    - 미국
-        - NASDAQ
-        - NYSE
-        - AMEX
-- Response(stocks):
-```
-        {
-            "stockType": "worldstock",
-            "stockEndType": "stock",
-            "compareToPreviousPrice": {
-                "code": "2",
-                "text": "상승",
-                "name": "RISING"
-            },
-            "nationType": "USA",
-            "stockExchangeType": {
-                "code": "NSQ",
-                "zoneId": "EST5EDT",
-                "nationType": "USA",
-                "delayTime": 0,
-                "startTime": "0930",
-                "endTime": "1600",
-                "closePriceSendTime": "2031",
-                "nameKor": "나스닥 증권거래소",
-                "nameEng": "NASDAQ Stock Exchange",
-                "name": "NASDAQ",
-                "nationName": "미국",
-                "stockType": "worldstock",
-                "nationCode": "USA"
-            },
-            "reutersCode": "LYT.O",
-            "symbolCode": "LYT",
-            "stockName": "리투스 테크놀로지스 홀딩스",
-            "stockNameEng": "Lytus Technologies Holdings Ptv Ltd",
-            "reutersIndustryCode": "5720103010",
-            "industryCodeType": {
-                "code": "57201030",
-                "industryGroupKor": "온라인 서비스",
-                "name": "INDUSTRY57201030"
-            },
-            "openPrice": "0.14",
-            "closePrice": "0.12",
-            "compareToPreviousClosePrice": "0.06",
-            "fluctuationsRatio": "89.41",
-            "executedVolume": null,
-            "accumulatedTradingVolume": "1,009,479,875",
-            "accumulatedTradingValue": "126,410",
-            "accumulatedTradingValueKrwHangeul": "1,855억원",
-            "localTradedAt": "2025-03-27T16:00:00-04:00",
-            "marketStatus": "CLOSE",
-            "overMarketPriceInfo": null,
-            "marketValue": "3,671",
-            "marketValueHangeul": "0.04억 USD",
-            "marketValueKrwHangeul": "53.9억원",
-            "currencyType": {
-                "code": "USD",
-                "text": "US dollar",
-                "name": "USD"
-            },
-            "dividend": "0.00",
-            "dividendPayAt": "2024-02-23T21:00:00Z",
-            "tradeStopType": {
-                "code": "1",
-                "text": "운영.Trading",
-                "name": "TRADING"
-            },
-            "endUrl": "https://m.stock.naver.com/worldstock/stock/LYT.O",
-            "delayTime": 0,
-            "delayTimeName": "실시간",
-            "stockEndUrl": "https://m.stock.naver.com/worldstock/stock/LYT.O",
-            "exchangeOperatingTime": false
-        }
-```
-
-한국 전체 주식 조회 API
-- API URI
-    - https://m.stock.naver.com/api/stocks/marketValue/[거래소]
-- 거래소 정보
-    - 한국
-        - KOSPI
-        - KOSDAQ
-    - Response(stocks):
-```
-        {
-            "stockType": "domestic",
-            "stockEndType": "stock",
-            "itemCode": "005930",
-            "reutersCode": "005930",
-            "stockName": "삼성전자",
-            "sosok": "0",
-            "closePrice": "60,200",
-            "compareToPreviousClosePrice": "-1,600",
-            "compareToPreviousPrice": {
-                "code": "5",
-                "text": "하락",
-                "name": "FALLING"
-            },
-            "fluctuationsRatio": "-2.59",
-            "accumulatedTradingVolume": "16,222,219",
-            "accumulatedTradingValue": "980,043",
-            "accumulatedTradingValueKrwHangeul": "9,800억원",
-            "localTradedAt": "2025-03-28T16:11:53+09:00",
-            "marketValue": "3,563,622",
-            "marketValueHangeul": "356조 3,622억원",
-            "nav": "N/A",
-            "threeMonthEarningRate": "N/A",
-            "marketStatus": "CLOSE",
-            "tradeStopType": {
-                "code": "1",
-                "text": "운영.Trading",
-                "name": "TRADING"
-            },
-            "stockExchangeType": {
-                "code": "KS",
-                "zoneId": "Asia/Seoul",
-                "nationType": "KOR",
-                "delayTime": 0,
-                "startTime": "0900",
-                "endTime": "1530",
-                "closePriceSendTime": "1630",
-                "nameKor": "코스피",
-                "nameEng": "KOSPI",
-                "stockType": "domestic",
-                "nationCode": "KOR",
-                "nationName": "대한민국",
-                "name": "KOSPI"
-            },
-            "endUrl": "https://m.stock.naver.com/domestic/stock/005930",
-            "overMarketPriceInfo": {
-                "tradingSessionType": "AFTER_MARKET",
-                "overMarketStatus": "CLOSE",
-                "overPrice": "60,200",
-                "compareToPreviousPrice": {
-                    "code": "5",
-                    "text": "하락",
-                    "name": "FALLING"
-                },
-                "compareToPreviousClosePrice": "-1,600",
-                "fluctuationsRatio": "-2.59",
-                "localTradedAt": "2025-03-28T20:00:00+09:00",
-                "tradeStopType": {
-                    "code": "1",
-                    "text": "운영.Trading",
-                    "name": "TRADING"
-                }
-            }
-        }
-```
+https://github.com/devrootlee/tteoksang-crawler
 
 <h3>📝 주식 가격 정보 API</h3>
 
 주식 가격 정보를 얻어오기 위해 검색중 한국투자증권이 잘되있는 것 같아서 한국투자증권 Open API를 신청하였다.
 - 한국투자증권 Open API 신청
     - [한국투자증권 Open API 홈페이지](https://apiportal.koreainvestment.com/intro)
-- 사용할 API 선택 - 용도
-    - [한국주식]
-        - 일별 종목 종가 조회
-    - [미국주식]
-        - 일별 종목 종가 조회
+- 사용할 API
+  - [공용]
+    - 접근 토큰 발급
+      - API: [POST] https://openapi.koreainvestment.com:9443/oauth2/tokenP
+  - [한국주식]
+    - 주식현재가 일자별
+      - API: [GET] https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price
+  - [미국주식]
+    - 해외주식 기간별시세
+      - API: [GET] https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice
 
 
 <h3>📝 오류 모니터링</h3>

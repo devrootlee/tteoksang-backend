@@ -1,6 +1,6 @@
 package com.example.tteoksang.controller;
 
-import com.example.tteoksang.servcie.BatchService;
+import com.example.tteoksang.service.ExternalApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/sync")
 @RequiredArgsConstructor
 public class SyncController {
-    private final BatchService batchService;
+    private final ExternalApiService externalApiService;
 
     @PostMapping("/stockKr")
     public String SyncStockKr() {
-        batchService.stockKrSync();
+        externalApiService.stockKrSync();
 
         return "sync finish";
     }
 
     @PostMapping("/stockUs")
     public String SyncStockUs() {
-        batchService.stockUsSync();
+        externalApiService.stockUsSync();
 
         return "sync finish";
     }

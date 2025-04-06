@@ -18,7 +18,7 @@ public class ExceptionController {
     public void RuntimeException(RuntimeException e) {
         LOGGER.error(e.getMessage(), e);
 
-        slackNotification.sendNotification("500", "서버오류");
+//        slackNotification.sendNotification("500", "서버오류");
     }
 
     //서버 오류
@@ -26,6 +26,6 @@ public class ExceptionController {
     public void Exception(Exception e) {
         LOGGER.error(e.getMessage(), e);
 
-        slackNotification.sendNotification("500", "오류");
+//        slackNotification.sendNotification("500", "오류");
     }
 }

@@ -13,12 +13,12 @@ public class BatchJob {
     //한국 주식 정보 자동 동기화
     @Scheduled(cron = "0 0 21 * * *")
     public void stockKrJob() {
-        externalApiService.stockKrSync();
+        externalApiService.StockKrSync();
     }
 
     //미국 주식 정보 자동 동기화
     @Scheduled(cron = "0 0 09 * * *")
     public void stockUsJob() {
-        externalApiService.stockUsSync();
+        externalApiService.StockUsSync();
     }
 }

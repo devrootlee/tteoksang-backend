@@ -14,14 +14,14 @@ public class SyncController {
 
     @PostMapping("/stockKr")
     public String SyncStockKr() {
-        externalApiService.stockKrSync();
+        externalApiService.StockKrSync();
 
         return "sync finish";
     }
 
     @PostMapping("/stockUs")
     public String SyncStockUs() {
-        externalApiService.stockUsSync();
+        externalApiService.StockUsSync();
 
         return "sync finish";
     }

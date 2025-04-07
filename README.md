@@ -9,8 +9,8 @@
 <h3>📌 화면 구성</h3>
 - 메인 화면
   - [정중앙] 주식 예측 (떡상? 떡락?)
-    - 한국/미국 선택
-    - 사용자 입력 창(입력할 때 마다 선택 리스트 나옴)
+    - 종목코드 입력창(종목코드)
+      - 사용자 입력 창(입력할 때 마다 선택 리스트 나옴)
   - [왼쪽] 주식 물타기 (물타보자)
     - 보유 단가 입력창
     - 보유 수량 입력창
@@ -126,12 +126,18 @@ https://github.com/devrootlee/tteoksang-crawler
   - [공용]
     - 접근 토큰 발급
       - API: [POST] https://openapi.koreainvestment.com:9443/oauth2/tokenP
+      - CheckPoint: 하루에 여러번 조회시 API호출금지 될 수 있어서, 응답 데이터를 DB에 저장하여 유효기간 만료시에 재호출
   - [한국주식]
     - 주식현재가 일자별
       - API: [GET] https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price
+      - CheckPoint: 30일의 데이터만 불러오게할 수 있다.
   - [미국주식]
     - 해외주식 기간별시세
       - API: [GET] https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice
+      - CheckPoint 
+        - 해외주식은 30일의 데이터만 불러오게할 수 있는건 없고 조회시점으로부터 100일의 데이터를 불러올 수 있다, 
+        - 100일에서 30일의 데이터만 가져와 사용한다.
+        - 주식 전체 종목을 가져오기 위해 사용한 파이썬(FinanceReader)의 종목코드 값과 KIS 에서 사용하는 해외주식 종목코드 값이 달랐다.(ex: FinanceReader value: BRK.B KIS API Value: BRK/B) -> . 이 붙어있는 종목들을 보정하려하였으나 나중에 이런 데이터가 더 생길수도 있어서 문제없게 그냥 삭제처리해준다.
 
 
 <h3>📝 오류 모니터링</h3>

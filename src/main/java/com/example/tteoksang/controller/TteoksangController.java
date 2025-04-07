@@ -14,7 +14,6 @@ public class TteoksangController {
     private final CommonUtil commonUtil;
 
     private final TteoksangService tteoksangService;
-    private final ExternalApiService externalApiService;
 
     @GetMapping("/stock")
     public ResponseEntity getStock(@RequestParam(value = "stockId") String stockId,
@@ -23,8 +22,11 @@ public class TteoksangController {
         return commonUtil.ApiResponse(tteoksangService.selectStock(stockId, stockName));
     }
 
-    @PostMapping("/predict")
-    public ResponseEntity prediction() {
-        return commonUtil.ApiResponse(null);
+    @GetMapping("/prediction")
+    public ResponseEntity getPrediction(@RequestParam(value = "nationType") String nationType,
+                                        @RequestParam(value = "stockId") String stockId,
+                                        @RequestParam(value = "market") String market) {
+
+        return commonUtil.ApiResponse(tteoksangService.selectPrediction(nationType, stockId, market));
     }
 }

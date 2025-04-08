@@ -77,23 +77,37 @@ CREATE INDEX idx_market ON stock(market);
 CREATE INDEX idx_stock_name ON stock(stock_name);
 ```
 
-- 데이터 수집 소요 시간 테이블(data_ingest_duration_log)
+- 데이터 수집 소요 시간 테이블(data_ingest_log)
 
 데이터가 수집될때 얼마나 걸리는지 확인 하기위한 테이블
 ```
 CREATE TABLE data_ingest_log (
-  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  run_date DATE NOT NULL,
-  script_name VARCHAR(255) NOT NULL,
-  start_time TIMESTAMP NOT NULL,
-  end_time TIMESTAMP NOT NULL,
-  duration FLOAT NOT NULL,
-  status VARCHAR(255) NOT NULL
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    run_date DATE NOT NULL,
+    script_name VARCHAR(255) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    duration FLOAT NOT NULL,
+    status VARCHAR(255) NOT NULL
 );
 ```
+- 예측한 주식 내역(predicted_stock_history) 테이블
+
+예측 결과가 나온 주식의 내역을 저장하는 테이블
+```
+CREATE TABLE predicted_stock_history (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    date_key int NOT NULL,
+    stock_id VARCHAR(255),
+    ip_address VARCHAR(45), -- IPv6까지 대비하려면 45
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+```
+
 - 한국투자 Open API 접근 토큰 정보 테이블
 
-한투 API명세서에 아래와 같이 기재되어있다. 토큰과 유효기간을 DB에 저장하여 여러번 API 호출을 막기위한 용도로 사용한다. 
+한투 API명세서에 아래와 같이 기재되어있다. 토큰과 유효기간을 DB에 저장하여 여러번 API 호출을 막기위한 용도로 사용하는 테이블 
 1. 접근토큰(access_token)의 유효기간은 24시간 이며(1일 1회발급 원칙)
    갱신발급주기는 6시간 입니다.(6시간 이내는 기존 발급키로 응답)
 2. 접근토큰발급(/oauth2/tokenP) 시 접근토큰값(access_token)과 함께 수신되는

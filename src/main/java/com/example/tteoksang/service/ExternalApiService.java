@@ -113,7 +113,7 @@ public class ExternalApiService {
                 .uri(uriBuilder -> uriBuilder
                         .path("/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice")
                         // 조건 시장 분류 코드(J: KRX, NX: NXT, UN: 통합)
-                        .queryParam("FID_COND_MRKT_DIV_CODE", "UN")
+                        .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                         // 종목코드
                         .queryParam("FID_INPUT_ISCD", stockId)
                         // 조회 시작날짜
@@ -135,10 +135,6 @@ public class ExternalApiService {
 
         if (response != null && response.get("output2") instanceof List) {
             result = (List<Map<String, Object>>) response.get("output2");
-            System.out.println(startDate);
-            System.out.println(endDate);
-            System.out.println(result);
-            System.out.println(result.size());
         }
         return result;
     }

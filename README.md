@@ -142,15 +142,15 @@ https://github.com/devrootlee/tteoksang-crawler
       - API: [POST] https://openapi.koreainvestment.com:9443/oauth2/tokenP
       - CheckPoint: 하루에 여러번 조회시 API호출금지 될 수 있어서, 응답 데이터를 DB에 저장하여 유효기간 만료시에 재호출
   - [한국주식]
-    - 주식현재가 일자별
-      - API: [GET] https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price
-      - CheckPoint: 30일의 데이터만 불러오게할 수 있다.
+    - 주식현재가 기간별 시세
+      - API: [GET] https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice
+      - CheckPoint
+        - 조회시작일과 조회종료일을 지정할 있는데 100일의 데이터를 가져오려고 하였는데 휴장일이 겹쳐있어서 그런지 데이터 조회가 잘되지않았다, 그래서 200일전을 조회시작일로 잡고 90일의 데이터만 가져온다.
   - [미국주식]
-    - 해외주식 기간별시세
+    - 해외주식 기간별 시세
       - API: [GET] https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice
-      - CheckPoint 
-        - 해외주식은 30일의 데이터만 불러오게할 수 있는건 없고 조회시점으로부터 100일의 데이터를 불러올 수 있다, 
-        - 100일에서 30일의 데이터만 가져와 사용한다.
+      - CheckPoint
+        - 100일에서 90일의 데이터만 가져와 사용한다.
         - 주식 전체 종목을 가져오기 위해 사용한 파이썬(FinanceReader)의 종목코드 값과 KIS 에서 사용하는 해외주식 종목코드 값이 달랐다.(ex: FinanceReader value: BRK.B KIS API Value: BRK/B) -> . 이 붙어있는 종목들을 보정하려하였으나 나중에 이런 데이터가 더 생길수도 있어서 문제없게 그냥 삭제처리해준다.
 
 

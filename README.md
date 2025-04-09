@@ -24,11 +24,9 @@
   - [무적해병체](https://www.rokmc.mil.kr:10005/contents/view.do?sMenuKey=304&contentKey=161)
 
 <h3>📌 기능</h3>
-- 주식 종목 정보 업데이트
-- 각 시장 Top10 순위
-- 예측 많이 한 주식 Top10 순위
-- 물타기 계산 기능
 - 주식 예측
+- 주식 종목 정보 검색(한국주식은 한글 or 종목코드, 미국주식은 영문 or 종목코드)
+- 예측 많이 한 주식 Top10 순위
 
 <h3>📝 주식 가격 예측 공식</h3>
 
@@ -159,19 +157,32 @@ https://github.com/devrootlee/tteoksang-crawler
 
 
 <h3>📝 CI/CD</h3>
-도커를 이용해 백엔드 이미지, 프론트 이미지를 만들어 배포한다.
+### 📌 인프라 구성
 
-<h3>📝 Server</h3>
-AWS를 사용하려하였으나 이전 프로젝트에서 free-tier 를 다 사용해서 MS Azure를 사용하기로 하였다.
-- Pass 방식
-📦 MyResourceGroup
-┣ 📂 백엔드 (Spring Boot, Docker) → 가상 머신(ubuntu 24.04)
-┣ 📂 프론트엔드 (React, Nginx, Docker) → 가상 머신(ubuntu 24.04)
-┗ 📂 데이터베이스 (PostgreSQL) → Azure Database for PostgreSQL 유연한 서버
+- **서버**: Microsoft Azure 가상 머신 (Ubuntu 24.04)
+- **프론트엔드**: GitHub Pages (정적 배포)
+- **백엔드/데이터 수집**: Docker Compose를 통해 Azure VM에서 통합 운영
+- **데이터베이스**: Azure Database for PostgreSQL (유연한 서버)
 
-1. 데이터베이스
-- 
+### 📁 프로젝트 구성
 
-2. 백엔드 서버
-- property를 개발용과 배포용으로 나누어서 생성
-  - ![img_1.png](img_1.png)
+이 프로젝트는 **3개의 독립된 레포지토리 또는 구성 요소**로 이루어져 있습니다:
+
+- **[`tteoksang-front`](https://github.com/devrootlee/tteoksang-front)** (React)  
+  → GitHub Pages로 **정적 배포**  
+  → 사용자 인터페이스를 담당
+
+- **[`tteoksang-backend`](https://github.com/devrootlee/tteoksang-backend)** (Spring Boot)  
+  → Docker 이미지화 후 `docker-compose`로 통합 관리  
+  → **API 서버**, 클라이언트 요청 처리 및 **주식 예측 기능** 담당
+
+
+- **[`tteoksang-crawler`](https://github.com/devrootlee/tteoksang-crawler)** (Python)  
+  → Docker 이미지화 후 `docker-compose`로 통합 관리  
+  → **데이터 수집 서버**, 주식 전체 정보를 수집
+
+### 서버 패키지 구성
+- app
+  - tteoksang-backend.tar(springboot, docker image)
+  - tteoksang-crawler.tar(python, docker image)
+  - docker-compose.yml

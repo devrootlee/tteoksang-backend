@@ -56,8 +56,8 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           source: |
             tteoksang-backend.tar
-            .env
           target: "~/app"
+          debug: true
 
       # ✅ 이미지 로드 + Compose 로 SpringBoot 만 재시작
       - name: Reload SpringBoot container via docker-compose

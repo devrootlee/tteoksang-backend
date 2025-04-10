@@ -33,15 +33,30 @@ jobs:
       - name: Save Docker image as tar
         run: docker save tteoksang-backend > tteoksang-backend.tar
 
-      # ✅ tar 파일을 서버에 전송
-      - name: Copy image to Server
+      # ✅ .env 파일 생성
+      - name: Create .env file
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB=${{ secrets.DB }}" >> .env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "KIS_APPKEY=${{ secrets.KIS_APPKEY }}" >> .env
+          echo "KIS_APPSECRET=${{ secrets.KIS_APPSECRET }}" >> .env
+          echo "EXTERNAL_API_CRAWLER=${{ secrets.EXTERNAL_API_CRAWLER }}" >> .env
+          echo "EXTERANL_API_KIS=${{ secrets.EXTERANL_API_KIS }}" >> .env
+
+      # ✅ tar 파일과 .env 서버에 전송
+      - name: Copy image and env to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
-          source: "tteoksang-backend.tar"
+          source: |
+            tteoksang-backend.tar
+            .env
           target: "~/app"
+
       # ✅ 이미지 로드 + Compose 로 SpringBoot 만 재시작
       - name: Reload SpringBoot container via docker-compose
         uses: appleboy/ssh-action@v1.0.0

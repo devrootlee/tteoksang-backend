@@ -15,7 +15,7 @@ spring:
 external:
   api:
     crawler: ${EXTERNAL_API_CRAWLER} # tteoksang-crawler fast api
-    kis: ${EXTERANL_API_KIS} # 한국투자증권 api
+    kis: ${EXTERNAL_API_KIS} # 한국투자증권 api
 
 # KIS secret
 kis:

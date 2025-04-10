@@ -43,7 +43,7 @@ jobs:
           echo "KIS_APPKEY=${{ secrets.KIS_APPKEY }}" >> .env
           echo "KIS_APPSECRET=${{ secrets.KIS_APPSECRET }}" >> .env
           echo "EXTERNAL_API_CRAWLER=${{ secrets.EXTERNAL_API_CRAWLER }}" >> .env
-          echo "EXTERANL_API_KIS=${{ secrets.EXTERANL_API_KIS }}" >> .env
+          echo "EXTERNAL_API_KIS=${{ secrets.EXTERNAL_API_KIS }}" >> .env
 
       # ✅ tar 파일과 .env 서버에 전송
       - name: Copy image and env to Server

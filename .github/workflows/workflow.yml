@@ -57,9 +57,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
-          source:
-            - "tteoksang-backend.tar"
-            - ".env"
+          source: "tteoksang-backend.tar,.env"
           target: "~/app"
           debug: true
 

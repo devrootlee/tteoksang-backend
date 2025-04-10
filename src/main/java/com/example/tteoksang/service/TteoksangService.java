@@ -5,13 +5,15 @@ import com.example.tteoksang.domain.PredictedStockHistory;
 import com.example.tteoksang.domain.Stock;
 import com.example.tteoksang.domain.repository.PredictedStockHistoryRepository;
 import com.example.tteoksang.domain.repository.StockRepository;
+import com.example.tteoksang.dto.querydto.Top10PredictionStockDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -183,7 +185,35 @@ public class TteoksangService {
         predictedStockHistoryRepository.save(history);
 
         // Redis 저장
+    }
 
+    public Map<String, Object> selectPredictionTop10 () {
+       Map<String, Object> result = new HashMap<>();
+        // 포매터 정의
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate baseDate = LocalDateTime.now().toLocalDate();
 
+        // 오늘 날짜
+        int today = Integer.parseInt(baseDate.format(formatter));
+
+        // 주간 시작일 (월요일)
+        int startOfWeek = Integer.parseInt(baseDate.with(DayOfWeek.MONDAY).format(formatter).toString());
+        // 주간 종료일 (일요일)
+        int endOfWeek = Integer.parseInt(baseDate.with(DayOfWeek.SUNDAY).format(formatter).toString());
+
+        // 월간 시작일
+        int startOfMonth = Integer.parseInt(baseDate.withDayOfMonth(1).format(formatter).toString());
+        // 월간 종료일
+        int endOfMonth = Integer.parseInt(baseDate.withDayOfMonth(baseDate.lengthOfMonth()).format(formatter).toString());
+
+       List<Top10PredictionStockDto> dailyTop10 = predictedStockHistoryRepository.findTop10(today, today);
+       List<Top10PredictionStockDto> weeklyTop10 = predictedStockHistoryRepository.findTop10(startOfWeek, endOfWeek);
+       List<Top10PredictionStockDto> monthlyTop10 = predictedStockHistoryRepository.findTop10(startOfMonth, endOfMonth);
+
+       result.put("daily", dailyTop10);
+       result.put("weekly", weeklyTop10);
+       result.put("monthly", monthlyTop10);
+
+       return result;
     }
 }

@@ -29,21 +29,15 @@
 - 예측 많이 한 주식 Top10 순위
 
 <h3>📝 주식 가격 예측 공식</h3>
+⚙️ 사용 알고리즘
+- SMA (Simple Moving Average): 최근 20일간의 단순 평균.
 
-주식가격을 예측할때 어떤 공식을 사용할 지 고민해봤다.
-요청받은 날짜 기준으로 30거래일의 종가를 이용하려 했는데, 아래 3가지 방법을 찾아내었다.
-아래 3가지중 가장 간단한 1번 SMA 방법을 사용하기로 결정했다.
+- EMA (Exponential Moving Average): 최근 가격에 더 가중치를 둔 평균.
 
-1. 단순 이동평균 (Simple Moving Average, SMA)
-   - 최근 30거래일 종가를 모두 더한 뒤 30으로 나누면 평균값(SMA)
-   - 만약 SMA가 최근 종가보다 높다면 상승 추세, 낮다면 하락 추세로 해석
+- Linear Regression: 가격의 시간 흐름에 따른 기울기를 기반으로 한 예측.
 
-2. 지수 이동평균 (Exponential Moving Average, EMA)
-   - EMA는 최근 데이터에 더 큰 가중치를 둠
-   - 30일 EMA를 계산하려면 처음 SMA를 구한 뒤, 매일 이 공식을 업데이트
-
-3. 간단한 선형 회귀 (Linear Regression)
-   - 30일 데이터를 점으로 찍고 직선을 그려서 미래 값(31일째)을 예측, 기울기 b가 양수면 상승, 음수면 하락 추세
+종합 예측: 예측가 = 0.3 * SMA + 0.4 * EMA + 0.3 * 선형회귀
+예측가(predictedPrice)와 현재가를 비교해 트렌드(상승/하락/보합 예상)를 판단
 
 <h3>💾 DB 설계 및 구축</h3>
 데이터베이스는 MySQL이나 PostgreSQL 중 고민하였으나 아래와 같은 이유로 PostgreSQL을 사용하기로 결정하였다.
@@ -168,16 +162,15 @@ https://github.com/devrootlee/tteoksang-crawler
 
 이 프로젝트는 **3개의 독립된 레포지토리 또는 구성 요소**로 이루어져 있습니다:
 
-- **[`tteoksang-front`](https://github.com/devrootlee/tteoksang-front)** (React)  
+- **[`tteoksang-front`](https://github.com/devrootlee/tteoksang-front)** (React)
   → GitHub Pages로 **정적 배포**  
   → 사용자 인터페이스를 담당
 
-- **[`tteoksang-backend`](https://github.com/devrootlee/tteoksang-backend)** (Spring Boot)  
+- **[`tteoksang-backend`](https://github.com/devrootlee/tteoksang-backend)** (Spring Boot)
   → Docker 이미지화 후 `docker-compose`로 통합 관리  
   → **API 서버**, 클라이언트 요청 처리 및 **주식 예측 기능** 담당
 
-
-- **[`tteoksang-crawler`](https://github.com/devrootlee/tteoksang-crawler)** (Python)  
+- **[`tteoksang-crawler`](https://github.com/devrootlee/tteoksang-crawler)** (Python)
   → Docker 이미지화 후 `docker-compose`로 통합 관리  
   → **데이터 수집 서버**, 주식 전체 정보를 수집
 
@@ -186,6 +179,7 @@ https://github.com/devrootlee/tteoksang-crawler
   - tteoksang-backend.tar(springboot, docker image)
   - tteoksang-crawler.tar(python, docker image)
   - docker-compose.yml
+
 ### 서버 작업 스크립트
 ```
 # 기존 패키지 업데이트

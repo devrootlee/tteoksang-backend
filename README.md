@@ -186,3 +186,32 @@ https://github.com/devrootlee/tteoksang-crawler
   - tteoksang-backend.tar(springboot, docker image)
   - tteoksang-crawler.tar(python, docker image)
   - docker-compose.yml
+### 서버 작업 스크립트
+```
+# 기존 패키지 업데이트
+# 1. 기존 패키지 업데이트
+sudo apt update[tteoksang-server_key.pem](../../Downloads/tteoksang-server_key.pem)
+
+# 2. 필수 패키지 설치
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# 3. Docker 공식 GPG 키 추가
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# 4. Docker 저장소 추가
+echo \
+  "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# 5. 패키지 업데이트 & Docker 설치
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 6. Docker 실행 확인
+sudo docker run hello-world
+```

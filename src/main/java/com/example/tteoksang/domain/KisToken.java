@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class KisToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @Column(name = "access_token")

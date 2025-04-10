@@ -46,6 +46,9 @@ jobs:
           echo "KIS_APPSECRET=${{ secrets.KIS_APPSECRET }}" >> .env
           echo "EXTERNAL_API_CRAWLER=${{ secrets.EXTERNAL_API_CRAWLER }}" >> .env
           echo "EXTERNAL_API_KIS=${{ secrets.EXTERNAL_API_KIS }}" >> .env
+          
+          echo "📄 현재 디렉토리 파일 목록:"
+          ls -al          
 
       # ✅ tar 파일과 .env 서버에 전송
       - name: Copy image and env to Server
@@ -54,7 +57,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
-          source: "tteoksang-backend.tar .env"
+          source:
+            - "tteoksang-backend.tar"
+            - ".env"
           target: "~/app"
           debug: true
 

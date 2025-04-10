@@ -40,7 +40,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER_NAME }}
           key: ${{ secrets.SERVER_KEY }}
-          source: "springboot-app.tar"
+          source: "tteoksang-backend.tar"
           target: "~/app"
       # ✅ 이미지 로드 + Compose 로 SpringBoot 만 재시작
       - name: Reload SpringBoot container via docker-compose

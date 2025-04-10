@@ -221,4 +221,13 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # 8. Docker Compose 버전 확인
 docker-compose --version
+
+# 9 nginx 설치
+sudo apt install nginx
+
+# 10. certbot 설치 및 HTTPS 인증서 발급
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d [DOMAIN]
+
+# 11. nginx 설정 변경
 ```

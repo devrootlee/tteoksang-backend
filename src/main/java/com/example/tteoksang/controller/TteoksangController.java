@@ -45,4 +45,6 @@ public class TteoksangController {
     public ResponseEntity getPredictionTop10() {
         return commonUtil.ApiResponse(tteoksangService.selectPredictionTop10());
     }
+
+
 }

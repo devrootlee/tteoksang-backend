@@ -179,7 +179,7 @@ public class TteoksangService {
         PredictedStockHistory history = PredictedStockHistory.builder()
                 .dateKey(dateKey)
                 .stockId(stockId)
-                .ipAddress(ip)
+                .memberId(ip)
                 .createdAt(LocalDateTime.now())
                 .build();
         predictedStockHistoryRepository.save(history);

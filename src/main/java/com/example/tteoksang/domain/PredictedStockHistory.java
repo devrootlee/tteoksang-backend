@@ -24,8 +24,8 @@ public class PredictedStockHistory {
     @Column(name = "stock_id", nullable = false)
     String stockId;
 
-    @Column(name = "ip_address", nullable = false)
-    String ipAddress;
+    @Column(name = "member_id")
+    String memberId;
 
     @Column(name = "created_at", nullable = false)
     LocalDateTime createdAt;

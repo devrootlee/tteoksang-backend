@@ -18,11 +18,4 @@ public class SyncController {
 
         return "sync finish";
     }
-
-    @PostMapping("/stockUs")
-    public String SyncStockUs() {
-        externalApiService.StockUsSync();
-
-        return "sync finish";
-    }
 }

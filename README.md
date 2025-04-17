@@ -41,9 +41,7 @@
 
 <h3>💾 DB 설계 및 구축</h3>
 데이터베이스는 MySQL이나 PostgreSQL 중 고민하였으나 아래와 같은 이유로 PostgreSQL을 사용하기로 결정하였다.
-- PostgreSQL은 주식 데이터처럼 정확성과 안정성이 중요한 프로젝트에서 더 적합
 - JSON, 고급 SQL 기능, 트랜잭션 안정성 등에서 MySQL보다 강점이 많음
-- 확장성과 분석 기능이 뛰어나 주식 데이터 저장 및 처리에 최적화
 
 - 유저 정보 테이블(members)
 ```
@@ -182,9 +180,13 @@ https://github.com/devrootlee/tteoksang-crawler
 
 ### 서버 작업 스크립트
 ```
-# 기존 패키지 업데이트
+# db 설치
+1. sudo apt update
+2. sudo apt install postgresql postgresql
+3. sudo systemctl status postgresql
+
 # 1. 기존 패키지 업데이트
-sudo apt update[tteoksang-server_key.pem](../../Downloads/tteoksang-server_key.pem)
+sudo apt update
 
 # 2. 필수 패키지 설치
 sudo apt install -y ca-certificates curl gnupg lsb-release
@@ -192,7 +194,7 @@ sudo apt install -y ca-certificates curl gnupg lsb-release
 # 3. Docker 공식 GPG 키 추가
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 # 4. Docker 저장소 추가
 echo \

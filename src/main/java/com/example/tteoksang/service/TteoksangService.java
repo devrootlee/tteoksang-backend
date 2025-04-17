@@ -1,11 +1,14 @@
 package com.example.tteoksang.service;
 
 import com.example.tteoksang.common.util.CommonUtil;
+import com.example.tteoksang.domain.KrxStockInfo;
 import com.example.tteoksang.domain.PredictedStockHistory;
 import com.example.tteoksang.domain.Stock;
+import com.example.tteoksang.domain.repository.KrxStockInfoRepository;
 import com.example.tteoksang.domain.repository.PredictedStockHistoryRepository;
 import com.example.tteoksang.domain.repository.StockRepository;
 import com.example.tteoksang.dto.querydto.Top10PredictionStockDto;
+import com.example.tteoksang.dto.responsedto.GetStockResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,24 +17,34 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TteoksangService {
     private final ExternalApiService externalApiService;
 
-    private final StockRepository stockRepository;
+    private final KrxStockInfoRepository krxStockInfoRepository;
     private final PredictedStockHistoryRepository predictedStockHistoryRepository;
 
     private final CommonUtil commonUtil;
 
-    public Map<String, Object> selectStock(String stockId, String stockName) {
-        Map<String, Object> result = new HashMap<>();
-        List<Stock> stockList = stockRepository.findByStockIdContainingIgnoreCaseOrStockNameContainingIgnoreCase(stockId, stockName);
+    public GetStockResponseDto selectStock(String stockId, String stockName) {
+        List<KrxStockInfo> stockList = krxStockInfoRepository.findByStockIdContainingIgnoreCaseOrStockNameContainingIgnoreCase(stockId, stockName);
 
-        result.put("stockList", stockList);
+        List<GetStockResponseDto.Stock> stockDtoList = stockList.stream()
+                .map(stock -> GetStockResponseDto.Stock.builder()
+                        .stockId(stock.getStockId())
+                        .market(stock.getMarket())
+                        .stockName(stock.getStockName())
+                        .createdAt(stock.getCreatedAt())
+                        .updatedAt(stock.getUpdatedAt())
+                        .build())
+                .toList();
 
-        return result;
+        return GetStockResponseDto.builder()
+                .stockList(stockDtoList)
+                .build();
     }
 
     public Map<String, Object> selectPrediction(String nationType, String stockId, String market, String ip) {

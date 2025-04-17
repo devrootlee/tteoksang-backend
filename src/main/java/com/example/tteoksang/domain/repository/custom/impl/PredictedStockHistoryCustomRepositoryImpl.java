@@ -1,7 +1,7 @@
 package com.example.tteoksang.domain.repository.custom.impl;
 
+import com.example.tteoksang.domain.QKrxStockInfo;
 import com.example.tteoksang.domain.QPredictedStockHistory;
-import com.example.tteoksang.domain.QStock;
 import com.example.tteoksang.domain.repository.custom.PredictedStockHistoryCustomRepository;
 import com.example.tteoksang.dto.querydto.Top10PredictionStockDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,7 +19,7 @@ public class PredictedStockHistoryCustomRepositoryImpl implements PredictedStock
     @Override
     public List<Top10PredictionStockDto> findTop10(int startDateKey, int endDateKey) {
         QPredictedStockHistory history = QPredictedStockHistory.predictedStockHistory;
-        QStock stock = QStock.stock;
+        QKrxStockInfo stock = QKrxStockInfo.krxStockInfo;
 
         return queryFactory
                 .select(com.querydsl.core.types.Projections.constructor(

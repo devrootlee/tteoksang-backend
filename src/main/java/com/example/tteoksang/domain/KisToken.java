@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class KisToken {
     @Id
-    int id;
+    private int id;
 
     @Column(name = "access_token")
-    String accessToken;
+    private String accessToken;
 
     @Column(name = "expired_date")
-    LocalDateTime expiredDate;
+    private LocalDateTime expiredDate;
 
     @Column(name = "created_at", nullable = false)
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 }

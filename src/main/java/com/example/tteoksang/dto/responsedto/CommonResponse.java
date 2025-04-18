@@ -1,5 +1,6 @@
 package com.example.tteoksang.dto.responsedto;
 
+import com.example.tteoksang.exception.ValidationCode;
 import lombok.*;
 
 @Builder
@@ -12,7 +13,7 @@ public class CommonResponse<T> {
     private T data;
 
     public static <T> CommonResponse<T> success(T data) {
-        return new CommonResponse<>(true, "요청에 성공했습니다", data);
+        return new CommonResponse<>(true, ValidationCode.SUCCESS.getMsg(), data);
     }
 
     public static <T> CommonResponse<T> fail(String message) {

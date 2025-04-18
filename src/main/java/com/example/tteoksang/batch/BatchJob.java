@@ -11,14 +11,8 @@ public class BatchJob {
     private final ExternalApiService externalApiService;
 
     //한국 주식 정보 자동 동기화
-    @Scheduled(cron = "0 0 21 * * *")
+    @Scheduled(cron = "0 30 17 * * *")
     public void stockKrJob() {
         externalApiService.StockKrSync();
-    }
-
-    //미국 주식 정보 자동 동기화
-    @Scheduled(cron = "0 0 09 * * *")
-    public void stockUsJob() {
-        externalApiService.StockUsSync();
     }
 }

@@ -1,10 +1,12 @@
 package com.example.tteoksang.controller;
 
 import com.example.tteoksang.common.util.CommonUtil;
+import com.example.tteoksang.dto.requestdto.GetStockRequestDto;
 import com.example.tteoksang.dto.responsedto.CommonResponse;
 import com.example.tteoksang.dto.responsedto.GetStockResponseDto;
 import com.example.tteoksang.service.TteoksangService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +29,8 @@ public class TteoksangController {
 
     // 주식 조회
     @GetMapping("/stock")
-    public ResponseEntity<CommonResponse<GetStockResponseDto>> getStock(@RequestParam(value = "stockId") String stockId,
-                                                                       @RequestParam(value = "stockName") String stockName) {
-        return ResponseEntity.ok(CommonResponse.success(tteoksangService.selectStock(stockId, stockName)));
+    public ResponseEntity<CommonResponse<GetStockResponseDto>> getStock(@Valid GetStockRequestDto requestDto) {
+        return ResponseEntity.ok(CommonResponse.success(tteoksangService.selectStock(requestDto)));
     }
 
     // 주식 주가 전망 예측

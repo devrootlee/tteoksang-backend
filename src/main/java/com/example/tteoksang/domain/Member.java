@@ -17,6 +17,7 @@ public class Member {
     @Column(name = "member_id")
     private int memberId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "member_type", nullable = false)
     private MemberType memberType;
 

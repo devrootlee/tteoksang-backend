@@ -5,12 +5,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetStockResponseDto {
+public class StockSearchRes {
     private List<Stock> stockList;
 
     @Getter
@@ -30,3 +30,4 @@ public class GetStockResponseDto {
         private LocalDateTime updatedAt;
     }
 }
+

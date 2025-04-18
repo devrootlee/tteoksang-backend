@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GetStockRequestDto {
+public class StockSearchReq {
     @NotBlank
     private String keyword;
 }

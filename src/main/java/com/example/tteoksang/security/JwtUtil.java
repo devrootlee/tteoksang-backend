@@ -6,10 +6,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 
 @Component
@@ -64,6 +67,17 @@ public class JwtUtil {
                 .parseClaimsJws(jwt)
                 .getBody()
                 .getSubject();
+    }
+
+    public Authentication getAuthentication(String token) {
+        // JWT 에서 인증 정보 추출
+        String username = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+        return new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
     }
 
     // jwt 유효기간 확인

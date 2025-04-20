@@ -24,14 +24,14 @@ public class ExceptionController {
         return ResponseEntity.status(ValidationCode.REQUEST_ERROR.getCode()).body(CommonRes.fail(ValidationCode.REQUEST_ERROR.getMsg()));
     }
 
-    //외부 API 오류
+    //API 오류
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<CommonRes<String>> RuntimeException(RuntimeException e) {
         LOGGER.error(e.getMessage(), e);
 
 //        slackNotification.sendNotification("500", "서버오류");
 
-        return ResponseEntity.status(501).body(CommonRes.fail(""));
+        return ResponseEntity.status(500).body(CommonRes.fail(e.getMessage()));
     }
 
     //서버 오류

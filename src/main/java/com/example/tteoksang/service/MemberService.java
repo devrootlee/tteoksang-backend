@@ -11,18 +11,15 @@ import com.example.tteoksang.dto.requestdto.LocalLoginReq;
 import com.example.tteoksang.dto.requestdto.ValidateLocalIdReq;
 import com.example.tteoksang.dto.requestdto.LocalSignUpReq;
 import com.example.tteoksang.dto.requestdto.ValidateNicknameReq;
-import com.example.tteoksang.dto.responsedto.LocalLoginRes;
-import com.example.tteoksang.dto.responsedto.ValidateLocalIdRes;
-import com.example.tteoksang.dto.responsedto.LocalSignupRes;
-import com.example.tteoksang.dto.responsedto.ValidateNicknameRes;
+import com.example.tteoksang.dto.responsedto.*;
 import com.example.tteoksang.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -72,8 +69,15 @@ public class MemberService {
                 .build();
         memberLocal = memberLocalRepository.save(memberLocal);
 
+        MemberProfile memberProfile = MemberProfile.builder()
+                .memberId(member.getMemberId())
+                .nickname(request.getNickname())
+                .createdAt(now)
+                .build();
+        memberProfile = memberProfileRepository.save(memberProfile);
+
         return LocalSignupRes.builder()
-                .localId(memberLocal.getLocalId())
+                .success(true)
                 .build();
     }
 
@@ -88,17 +92,31 @@ public class MemberService {
             throw new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        // 3. nickname 가져오기
-        MemberProfile memberProfile = memberProfileRepository.findByMemberId(memberLocal.getMemberId());
-
         // jwt 생성
         String jwt = jwtUtil.generateJwt(memberLocal.getMemberId());
 
-
         return LocalLoginRes.builder()
-                .localId(memberLocal.getLocalId())
-                .nickname(memberProfile.getNickname())
+                .success(true)
                 .jwt(jwt)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public LoginStatusRes loginStatus(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return LoginStatusRes.builder()
+                    .isLoggedIn(false)
+                    .build();
+        }
+
+        int memberId = Integer.parseInt(authentication.getPrincipal().toString());
+
+        // 사용자 정보 조회
+        MemberProfile memberProfile = memberProfileRepository.findByMemberId(memberId);
+
+        return LoginStatusRes.builder()
+                .isLoggedIn(true)
+                .nickname(memberProfile.getNickname())
                 .build();
     }
 }

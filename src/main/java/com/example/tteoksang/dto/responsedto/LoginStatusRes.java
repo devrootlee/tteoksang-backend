@@ -7,6 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocalSignupRes {
-    private boolean success;
+public class LoginStatusRes {
+    private boolean isLoggedIn;
+    private String nickname;
 }

@@ -9,10 +9,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LocalLoginRes {
-    private String localId;
-
-    private String nickname;
+    private boolean success;
 
     @JsonIgnore // 바디에 안 보이게 처리
     private String jwt;
+
 }

@@ -4,10 +4,7 @@ import com.example.tteoksang.dto.requestdto.LocalLoginReq;
 import com.example.tteoksang.dto.requestdto.ValidateLocalIdReq;
 import com.example.tteoksang.dto.requestdto.LocalSignUpReq;
 import com.example.tteoksang.dto.requestdto.ValidateNicknameReq;
-import com.example.tteoksang.dto.responsedto.CommonRes;
-import com.example.tteoksang.dto.responsedto.LocalLoginRes;
-import com.example.tteoksang.dto.responsedto.ValidateLocalIdRes;
-import com.example.tteoksang.dto.responsedto.LocalSignupRes;
+import com.example.tteoksang.dto.responsedto.*;
 import com.example.tteoksang.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -49,9 +47,9 @@ public class MemberController {
     @PostMapping("/localLogin")
     @Operation(summary = "로컬 로그인")
     public ResponseEntity<CommonRes<LocalLoginRes>> localLogin(@RequestBody LocalLoginReq request) {
-        LocalLoginRes res = memberService.localLogin(request); // 여기서 JWT도 같이 리턴되도록
+        LocalLoginRes res = memberService.localLogin(request); // jwt 추출
 
-        // 1. 쿠키 생성
+        // 쿠키 생성
         ResponseCookie cookie = ResponseCookie.from("token", res.getJwt())
                 .httpOnly(true)
                 .secure(false)
@@ -60,15 +58,14 @@ public class MemberController {
                 .maxAge(Duration.ofHours(1))
                 .build();
 
-        // 2. 바디에선 JWT 제외하고 필요한 값만 리턴
-        LocalLoginRes resWithoutToken = LocalLoginRes.builder()
-                .localId(res.getLocalId())
-                .nickname(res.getNickname())
-                .build();
-
-        // 3. 커스터마이징된 응답
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(CommonRes.success(resWithoutToken));
+                .body(CommonRes.success(res));
+    }
+
+    @GetMapping("/loginStatus")
+    public ResponseEntity<CommonRes<LoginStatusRes>> loginStatus(Authentication authentication) {
+
+        return ResponseEntity.ok(CommonRes.success(memberService.loginStatus(authentication)));
     }
 }

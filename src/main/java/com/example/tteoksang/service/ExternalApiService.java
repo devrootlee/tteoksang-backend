@@ -51,15 +51,6 @@ public class ExternalApiService {
                 .block();
     }
 
-    // 미국 주식 수동 동기화
-    public void StockUsSync() {
-        crawlerWebClient.post()
-                .uri("/update-stock-us")
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
-    }
-
     // KIS 토큰 가져오기
     public String getKisToken() {
         String result = "";

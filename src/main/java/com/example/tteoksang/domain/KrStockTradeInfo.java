@@ -7,15 +7,16 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "krx_stock_trade_info")
+@Table(name = "kr_stock_trade_info")
 @Getter
 @Setter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class KrxStockTradeInfo {
+public class KrStockTradeInfo {
     @Id
     @Column(name = "stock_id")
     private String stockId;
@@ -46,4 +47,10 @@ public class KrxStockTradeInfo {
 
     @Column(name = "capacity")
     private long capacity;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

@@ -9,7 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Table(name = "krx_stock_info")
+@Table(name = "kr_stock_info")
 @Entity
 @Description(value = "한국 주식 정보")
 @Getter
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KrxStockInfo {
+public class KrStockInfo {
     @Id
     @Column(name = "stock_id")
     private String stockId;

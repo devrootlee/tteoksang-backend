@@ -15,17 +15,23 @@ repositories {
 dependencies {
     //Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
     //PostgreSQL
     implementation 'org.postgresql:postgresql:42.7.3' // 최신 버전은 확인 필요
+
     //logging
     implementation 'org.springframework.boot:spring-boot-starter-logging'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     //Spring Boot Security(JWT 인증용)
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     // JJWT (JWT 생성 및 검증)
-//    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-//    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' //JSON 직렬화 지원
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' //JSON 직렬화 지원
 
     //Lombok(코드 간소화)
     implementation 'org.projectlombok:lombok'

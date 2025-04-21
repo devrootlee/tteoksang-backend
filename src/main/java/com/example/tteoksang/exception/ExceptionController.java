@@ -1,8 +1,11 @@
 package com.example.tteoksang.exception;
 
+import com.example.tteoksang.dto.responsedto.CommonRes;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -13,19 +16,30 @@ public class ExceptionController {
 
     private final SlackNotification slackNotification;
 
-    //외부 API 오류
+    // request 오류
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<CommonRes<String>> MethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        LOGGER.error(e.getMessage(), e);
+
+        return ResponseEntity.status(ValidationCode.REQUEST_ERROR.getCode()).body(CommonRes.fail(ValidationCode.REQUEST_ERROR.getMsg()));
+    }
+
+    //API 오류
     @ExceptionHandler(value = RuntimeException.class)
-    public void RuntimeException(RuntimeException e) {
+    public ResponseEntity<CommonRes<String>> RuntimeException(RuntimeException e) {
         LOGGER.error(e.getMessage(), e);
 
 //        slackNotification.sendNotification("500", "서버오류");
+
+        return ResponseEntity.status(500).body(CommonRes.fail(e.getMessage()));
     }
 
     //서버 오류
     @ExceptionHandler(value = Exception.class)
-    public void Exception(Exception e) {
+    public ResponseEntity<CommonRes<String>> Exception(Exception e) {
         LOGGER.error(e.getMessage(), e);
 
 //        slackNotification.sendNotification("500", "오류");
+        return ResponseEntity.status(ValidationCode.SERVER_ERROR.getCode()).body(CommonRes.fail(ValidationCode.SERVER_ERROR.getMsg()));
     }
 }

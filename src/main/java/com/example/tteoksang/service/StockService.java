@@ -1,14 +1,13 @@
 package com.example.tteoksang.service;
 
 import com.example.tteoksang.common.util.CommonUtil;
-import com.example.tteoksang.domain.KrxStockInfo;
+import com.example.tteoksang.domain.KrStockInfo;
 import com.example.tteoksang.domain.PredictedStockHistory;
-import com.example.tteoksang.domain.Stock;
-import com.example.tteoksang.domain.repository.KrxStockInfoRepository;
+import com.example.tteoksang.domain.repository.KrStockInfoRepository;
 import com.example.tteoksang.domain.repository.PredictedStockHistoryRepository;
-import com.example.tteoksang.domain.repository.StockRepository;
 import com.example.tteoksang.dto.querydto.Top10PredictionStockDto;
-import com.example.tteoksang.dto.responsedto.GetStockResponseDto;
+import com.example.tteoksang.dto.requestdto.StockSearchReq;
+import com.example.tteoksang.dto.responsedto.StockSearchRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +16,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TteoksangService {
+public class StockService {
     private final ExternalApiService externalApiService;
 
-    private final KrxStockInfoRepository krxStockInfoRepository;
+    private final KrStockInfoRepository krStockInfoRepository;
     private final PredictedStockHistoryRepository predictedStockHistoryRepository;
 
     private final CommonUtil commonUtil;
 
-    public GetStockResponseDto selectStock(String stockId, String stockName) {
-        List<KrxStockInfo> stockList = krxStockInfoRepository.findByStockIdContainingIgnoreCaseOrStockNameContainingIgnoreCase(stockId, stockName);
+    public StockSearchRes selectStockSearch(StockSearchReq requestDto) {
+        List<KrStockInfo> stockList = krStockInfoRepository.findByStockIdContainingIgnoreCaseOrStockNameContainingIgnoreCase(requestDto.getKeyword(), requestDto.getKeyword());
 
-        List<GetStockResponseDto.Stock> stockDtoList = stockList.stream()
-                .map(stock -> GetStockResponseDto.Stock.builder()
+        List<StockSearchRes.Stock> stockDtoList = stockList.stream()
+                .map(stock -> StockSearchRes.Stock.builder()
                         .stockId(stock.getStockId())
                         .market(stock.getMarket())
                         .stockName(stock.getStockName())
@@ -42,12 +40,12 @@ public class TteoksangService {
                         .build())
                 .toList();
 
-        return GetStockResponseDto.builder()
+        return StockSearchRes.builder()
                 .stockList(stockDtoList)
                 .build();
     }
 
-    public Map<String, Object> selectPrediction(String nationType, String stockId, String market, String ip) {
+    public Map<String, Object> selectStockPrediction(String nationType, String stockId, String market, String ip) {
         Map<String, Object> result = new HashMap<>();
         result.put("nationType", nationType);
 
@@ -200,7 +198,7 @@ public class TteoksangService {
         // Redis 저장
     }
 
-    public Map<String, Object> selectPredictionTop10 () {
+    public Map<String, Object> selectStockPredictionTop10() {
        Map<String, Object> result = new HashMap<>();
         // 포매터 정의
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

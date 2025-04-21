@@ -64,8 +64,8 @@ public class MemberController {
     }
 
     @GetMapping("/loginStatus")
+    @Operation(summary = "로그인 상태")
     public ResponseEntity<CommonRes<LoginStatusRes>> loginStatus(Authentication authentication) {
-
         return ResponseEntity.ok(CommonRes.success(memberService.loginStatus(authentication)));
     }
 }

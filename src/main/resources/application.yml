@@ -21,3 +21,8 @@ external:
 kis:
   appkey: ${KIS_APPKEY}
   appsecret: ${KIS_APPSECRET}
+
+# JWT
+jwt:
+  secretkey: ${JWT_SECRETKEY}
+  expirationtime: ${JWT_EXPIRATIONTIME}

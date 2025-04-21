@@ -46,6 +46,8 @@ jobs:
           echo "KIS_APPSECRET=${{ secrets.KIS_APPSECRET }}" >> .env-backend
           echo "EXTERNAL_API_CRAWLER=${{ secrets.EXTERNAL_API_CRAWLER }}" >> .env-backend
           echo "EXTERNAL_API_KIS=${{ secrets.EXTERNAL_API_KIS }}" >> .env-backend
+          echo "JWT_SECRETKEY=${{ secrets.JWT_SECRETKEY }}" >> .env-backend
+          echo "JWT_EXPIRATIONTIME=${{ secrets.JWT_EXPIRATIONTIME }}" >> .env-backend
 
       # ✅ tar 파일과 .env 서버에 전송
       - name: Copy image and env to Server
